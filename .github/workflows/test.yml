@@ -15,7 +15,7 @@ on:
         description: 'Hub Extensions git ref'
         required: true
         default: 'gcp-extensions'
-      hubExtensionsCommit:
+      hubExtCommit:
         description: 'Hub Extensions commit hash. If empty latest is used.'
         required: false
         default: ''
@@ -49,6 +49,7 @@ jobs:
 
       - name: 'Outputs'
         run: |
+          echo "FULLNAME: ${{ env.GITHUB_ACTOR }}"
           echo "HUB CLI: ${{ github.event.inputs.hubCommit || steps.versions.outputs.hubVersion }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || steps.versions.outputs.hubExtVersion }}"
           echo "HUB State: ${{ github.event.inputs.hubStateCommit || steps.versions.outputs.hubStateVersion }}"
