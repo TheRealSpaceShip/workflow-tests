@@ -42,14 +42,16 @@ jobs:
           HUB_CLI_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub.git "${{ github.event.inputs.hubRef }}" 2>/dev/null | cut -c-7)
           HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub-extensions.git "${{ github.event.inputs.hubExtRef }}" 2>/dev/null | cut -c-7)
           HUB_STATE_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub-state.git "${{ github.event.inputs.hubStateRef }}" 2>/dev/null | cut -c-7)
+          FULL_NAME=$(curl -s -H "Accept: application/vnd.github.v3+json" "${{ github.event.sender.url }}" | jq -crM '.name | select(.)')
 
           echo "::set-output name=hubVersion::$HUB_CLI_VERSION"
           echo "::set-output name=hubExtVersion::$HUB_EXTENSIONS_VERSION"
           echo "::set-output name=hubStateVersion::$HUB_STATE_VERSION"
+          echo "::set-output name=fullname::$FULL_NAME"
 
       - name: 'Outputs'
         run: |
-          echo "FULLNAME: $GITHUB_ACTOR"
+          echo "FULLNAME: ${{ steps.versions.outputs.fullname || GITHUB_ACTOR }}"
           echo "HUB CLI: ${{ github.event.inputs.hubCommit || steps.versions.outputs.hubVersion }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || steps.versions.outputs.hubExtVersion }}"
           echo "HUB State: ${{ github.event.inputs.hubStateCommit || steps.versions.outputs.hubStateVersion }}"
