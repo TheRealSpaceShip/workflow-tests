@@ -51,7 +51,7 @@ jobs:
 
       - name: 'Outputs'
         run: |
-          echo "FULLNAME: ${{ steps.versions.outputs.fullname || GITHUB_ACTOR }}"
+          echo "FULLNAME: ${{ steps.versions.outputs.fullname || github.actor }}"
           echo "HUB CLI: ${{ github.event.inputs.hubCommit || steps.versions.outputs.hubVersion }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || steps.versions.outputs.hubExtVersion }}"
           echo "HUB State: ${{ github.event.inputs.hubStateCommit || steps.versions.outputs.hubStateVersion }}"
