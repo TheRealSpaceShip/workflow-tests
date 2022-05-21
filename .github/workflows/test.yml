@@ -27,15 +27,19 @@ on:
         description: 'Hub State commit hash. If empty latest is used.'
         required: false
         default: ''
-
+  repository_dispatch:
+    types:
+      - hello-world
+    
 jobs:
   build:
     runs-on: 'ubuntu-latest'
 
     steps:
-      - name: Checkout
-        uses: 'actions/checkout@v3'
-
+      - name: 'Say hello'
+        run: |
+          echo "Hello ${{ github.event.client_payload.name }}"
+        
       - id: 'versions'
         name: 'Calculate versions'
         run: |
