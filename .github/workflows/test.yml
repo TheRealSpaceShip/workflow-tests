@@ -37,6 +37,7 @@ jobs:
 
     steps:
       - name: 'Say hello'
+        if: ${{ github.event.client_payload }}
         run: |
           echo "Hello ${{ github.event.client_payload.name }}"
         
