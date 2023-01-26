@@ -58,6 +58,6 @@ jobs:
 
       - name: 'Outputs'
         run: |
-          echo "HUB CLI: ${{ steps.versions.outputs.hubVersion }}"
-          echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || steps.versions.outputs.hubExtVersion }}"
-          echo "HUB State: ${{ steps.versions.outputs.hubStateVersion }}"
+          echo "HUB CLI: ${{ env.hubVersion }}"
+          echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.hubExtVersion }}"
+          echo "HUB State: ${{ env.hubStateVersion }}"
