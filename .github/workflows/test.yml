@@ -3,7 +3,7 @@ name: 'Test'
 on:
   push:
     tags:
-    - 'v*.*.*\+base'
+    - 'base'
   workflow_dispatch:
     inputs:
       hubVersion:
@@ -65,19 +65,31 @@ jobs:
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=semver,suffix=-base,pattern={{version}},enable=${{ github.event.inputs.customTag == '' }}
-            type=semver,suffix=-base,pattern={{major}}.{{minor}},enable=${{ github.event.inputs.customTag == '' }}
-            type=semver,suffix=-base,pattern={{major}},enable=${{ github.event.inputs.customTag == '' }}
-            type=semver,pattern={{version}},enable=${{ github.event.inputs.customTag == '' }}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event.inputs.customTag == '' }}
-            type=semver,pattern={{major}},enable=${{ github.event.inputs.customTag == '' }}
+            type=schedule,suffix=-base,pattern={{date 'YYYYMMDD-hhmmss'}},enable=${{ github.event.inputs.customTag == '' }}
+            type=schedule,pattern={{date 'YYYYMMDD-hhmmss'}},enable=${{ github.event.inputs.customTag == '' }}
             type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
             type=raw,prefix=custom-,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
 
       -
         name: 'Outputs'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
           echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
+
+          # Setup git
+          USERNAME="${{ github.event.head_commit.author.name || github.actor }}"
+          USEREMAIL="${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}"
+          git config user.name "$USERNAME"
+          git config user.email "$USEREMAIL"
+          gh auth setup-git
+
+          # Create git tag and push it
+          TAG="${{ steps.meta.outputs.version }}"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+
