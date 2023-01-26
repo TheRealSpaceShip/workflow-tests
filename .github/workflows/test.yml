@@ -1,62 +1,63 @@
 name: 'Test'
 
 on:
+  push:
+    tags:
+    - 'v*.*.*-base'
   workflow_dispatch:
     inputs:
-      hubRef:
-        description: 'Hub CLI git ref'
+      hubVersion:
+        description: 'Hub CLI release version. Use "latest" or release number (ex. 1.0.0).'
         required: true
-        default: 'v1.0.6'
-      hubCommit:
-        description: 'Hub CLI commit hash. If empty latest release tag is used.'
-        required: false
-        default: ''
+        default: 'latest'
+      hubStateVersion:
+        description: 'Hub State release version. Use "latest" or release number (ex. 1.0.0).'
+        required: true
+        default: 'latest'
       hubExtRef:
-        description: 'Hub Extensions git ref'
+        description: 'Hub Extensions git ref.'
         required: true
-        default: 'gcp-extensions'
+        default: 'stable'
       hubExtCommit:
-        description: 'Hub Extensions commit hash. If empty latest is used.'
+        description: 'Hub Extensions commit hash. If empty Hub Extensions git ref is used.'
         required: false
         default: ''
-      hubStateRef:
-        description: 'Hub State git ref'
+      customTag:
+        description: 'Custom base image tag.'
         required: true
-        default: 'master'
-      hubStateCommit:
-        description: 'Hub State commit hash. If empty latest is used.'
-        required: false
-        default: ''
-  repository_dispatch:
-    types:
-      - hello-world
-    
+
 jobs:
   build:
     runs-on: 'ubuntu-latest'
 
     steps:
-      - name: 'Say hello'
-        if: ${{ github.event.client_payload }}
-        run: |
-          echo "Hello ${{ github.event.client_payload.name }}"
-        
       - id: 'versions'
         name: 'Calculate versions'
         run: |
-          HUB_CLI_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub.git "${{ github.event.inputs.hubRef }}" 2>/dev/null | cut -c-7)
-          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub-extensions.git "${{ github.event.inputs.hubExtRef }}" 2>/dev/null | cut -c-7)
-          HUB_STATE_VERSION=$(git ls-remote -q https://github.com/agilestacks/hub-state.git "${{ github.event.inputs.hubStateRef }}" 2>/dev/null | cut -c-7)
-          FULL_NAME=$(curl -s -H "Accept: application/vnd.github.v3+json" "${{ github.event.sender.url }}" | jq -crM '.name | select(.)')
+          HUB_CTL_VERSION="${{ github.event.inputs.hubVersion }}"
+          if test "$HUB_CTL_VERSION" = "latest"; then
+            HUB_CTL_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hubctl/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
+            if test -z "$HUB_CTL_VERSION"; then
+              echo "Hub CLI version can't be empty"
+              exit 1
+            fi
+          fi
+          HUB_STATE_VERSION="${{ github.event.inputs.hubStateVersion }}"
+          if test "$HUB_STATE_VERSION" = "latest"; then
+            HUB_STATE_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hub-state/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
+            if test -z "$HUB_STATE_VERSION"; then
+              echo "Hub State extension version can't be empty"
+              exit 1
+            fi
+          fi
+          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef || stable }}" 2>/dev/null | cut -c-7)
 
-          echo "::set-output name=hubVersion::$HUB_CLI_VERSION"
-          echo "::set-output name=hubExtVersion::$HUB_EXTENSIONS_VERSION"
-          echo "::set-output name=hubStateVersion::$HUB_STATE_VERSION"
-          echo "::set-output name=fullname::$FULL_NAME"
+          echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
+          echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
+          echo "HUB_STATE_VERSION=$HUB_STATE_VERSION" >> $GITHUB_ENV
 
       - name: 'Outputs'
         run: |
-          echo "FULLNAME: ${{ steps.versions.outputs.fullname || github.actor }}"
-          echo "HUB CLI: ${{ github.event.inputs.hubCommit || steps.versions.outputs.hubVersion }}"
+          echo "HUB CLI: ${{ steps.versions.outputs.hubVersion }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || steps.versions.outputs.hubExtVersion }}"
-          echo "HUB State: ${{ github.event.inputs.hubStateCommit || steps.versions.outputs.hubStateVersion }}"
+          echo "HUB State: ${{ steps.versions.outputs.hubStateVersion }}"
