@@ -35,7 +35,7 @@ jobs:
         name: 'Calculate versions'
         run: |
           HUB_CTL_VERSION="${{ github.event.inputs.hubVersion }}"
-          if test "$HUB_CTL_VERSION" = "latest"; then
+          if test "$HUB_CTL_VERSION" = "latest" || test -z "$HUB_CTL_VERSION"; then
             HUB_CTL_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hubctl/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
             if test -z "$HUB_CTL_VERSION"; then
               echo "Hub CLI version can't be empty"
@@ -43,14 +43,14 @@ jobs:
             fi
           fi
           HUB_STATE_VERSION="${{ github.event.inputs.hubStateVersion }}"
-          if test "$HUB_STATE_VERSION" = "latest"; then
+          if test "$HUB_STATE_VERSION" = "latest" || test -z "$HUB_STATE_VERSION"; then
             HUB_STATE_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hub-state/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
             if test -z "$HUB_STATE_VERSION"; then
               echo "Hub State extension version can't be empty"
               exit 1
             fi
           fi
-          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef }}" 2>/dev/null | cut -c-7)
+          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef || "stable" }}" 2>/dev/null | cut -c-7)
 
           echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
           echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
