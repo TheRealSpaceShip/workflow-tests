@@ -60,17 +60,20 @@ jobs:
           echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
           echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
           echo "HUB_STATE_VERSION=$HUB_STATE_VERSION" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_TAG=$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_ENV
 
       -
         name: Image meta
         id: meta
         uses: docker/metadata-action@v4
         with:
+          flavor: |
+            latest=true
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=schedule,suffix=-base,pattern={{date 'YYYYMMDD-HHmmss'}},enable=${{ github.event.inputs.customTag == '' }}
-            type=schedule,pattern={{date 'YYYYMMDD-HHmmss'}},enable=${{ github.event.inputs.customTag == '' }}
+            type=raw,suffix=-base,pattern=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
+            type=raw,pattern=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
             type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
             type=raw,prefix=custom-,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
 
