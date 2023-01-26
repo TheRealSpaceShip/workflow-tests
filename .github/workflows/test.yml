@@ -31,7 +31,8 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-      - id: 'versions'
+      -
+        id: 'versions'
         name: 'Calculate versions'
         run: |
           HUB_CTL_VERSION="${{ github.event.inputs.hubVersion }}"
@@ -52,16 +53,25 @@ jobs:
           fi
           HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef || 'stable' }}" 2>/dev/null | cut -c-7)
 
-          echo "HUB_CTL_VERSION=${{ env.HUB_CTL_VERSION }}" >> $GITHUB_ENV
+          echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
           echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
           echo "HUB_STATE_VERSION=$HUB_STATE_VERSION" >> $GITHUB_ENV
 
-      - name: 'Just another step'
-        run: |
-          echo "One more step"
+      -
+        name: Image meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/epam/hub-toolbox
+          tags: |
+            type=semver,pattern={{raw}},enable=${{ github.event.inputs.customTag == '' }}
+            type=raw,prefix=custom,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
 
-      - name: 'Outputs'
+      -
+        name: 'Outputs'
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
           echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
