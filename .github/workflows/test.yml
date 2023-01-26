@@ -56,6 +56,10 @@ jobs:
           echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
           echo "HUB_STATE_VERSION=$HUB_STATE_VERSION" >> $GITHUB_ENV
 
+      - name: 'Just another step'
+        run: |
+          echo "One more step"
+
       - name: 'Outputs'
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
