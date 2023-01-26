@@ -50,7 +50,7 @@ jobs:
               exit 1
             fi
           fi
-          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef || "stable" }}" 2>/dev/null | cut -c-7)
+          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ github.event.inputs.hubExtRef || 'stable' }}" 2>/dev/null | cut -c-7)
 
           echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
           echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
