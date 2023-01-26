@@ -3,7 +3,7 @@ name: 'Test'
 on:
   push:
     tags:
-    - 'v*.*.*-base'
+    - 'v*.*.*+base'
   workflow_dispatch:
     inputs:
       hubVersion:
@@ -65,15 +65,14 @@ jobs:
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=match,pattern=\d.\d.\d,enable=${{ github.event.inputs.customTag == '' }}
-            type=match,pattern=\d.\d,enable=${{ github.event.inputs.customTag == '' }}
-            type=match,pattern=\d,enable=${{ github.event.inputs.customTag == '' }}
-            type=match,suffix=-base,pattern=\d.\d.\d,enable=${{ github.event.inputs.customTag == '' }}
-            type=match,suffix=-base,pattern=\d.\d,enable=${{ github.event.inputs.customTag == '' }}
-            type=match,suffix=-base,pattern=\d,enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,suffix=-base,pattern={{version}},enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,suffix=-base,pattern={{major}}.{{minor}},enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,suffix=-base,pattern={{major}},enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,pattern={{version}},enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event.inputs.customTag == '' }}
+            type=semver,pattern={{major}},enable=${{ github.event.inputs.customTag == '' }}
             type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,value=latest,enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,prefix=custom,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
+            type=raw,prefix=custom-,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
 
       -
         name: 'Outputs'
