@@ -72,10 +72,10 @@ jobs:
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=raw,suffix=-base,pattern=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,pattern=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
+            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }},suffix=-base
+            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
             type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,prefix=custom-,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
+            type=raw,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }},prefix=custom-
 
       -
         name: 'Outputs'
