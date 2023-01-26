@@ -32,6 +32,10 @@ jobs:
 
     steps:
       -
+        name: 'Checkout'
+        uses: 'actions/checkout@v3'
+
+      -
         id: 'versions'
         name: 'Calculate versions'
         run: |
@@ -65,8 +69,8 @@ jobs:
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=schedule,suffix=-base,pattern={{date 'YYYYMMDD-hhmmss'}},enable=${{ github.event.inputs.customTag == '' }}
-            type=schedule,pattern={{date 'YYYYMMDD-hhmmss'}},enable=${{ github.event.inputs.customTag == '' }}
+            type=schedule,suffix=-base,pattern={{date 'YYYYMMDD-HHmmss'}},enable=${{ github.event.inputs.customTag == '' }}
+            type=schedule,pattern={{date 'YYYYMMDD-HHmmss'}},enable=${{ github.event.inputs.customTag == '' }}
             type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
             type=raw,prefix=custom-,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }}
 
