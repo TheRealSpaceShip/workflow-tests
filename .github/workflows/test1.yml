@@ -24,7 +24,8 @@ on:
         default: ''
       customTag:
         description: 'Custom base image tag.'
-        required: true
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -39,9 +40,9 @@ jobs:
         id: 'versions'
         name: 'Calculate versions'
         env:
-          HUB_CTL_VERSION: ${{ github.event.inputs.hubVersion || 'latest' }}
-          HUB_STATE_VERSION: ${{ github.event.inputs.hubStateVersion || 'latest' }}
-          HUB_EXT_REF: ${{ github.event.inputs.hubExtRef || 'stable' }}
+          HUB_CTL_VERSION: ${{ inputs.hubVersion || 'latest' }}
+          HUB_STATE_VERSION: ${{ inputs.hubStateVersion || 'latest' }}
+          HUB_EXT_REF: ${{ inputs.hubExtRef || 'stable' }}
         run: |
           HUB_CTL_VERSION="${{ env.HUB_CTL_VERSION }}"
           if test "$HUB_CTL_VERSION" = "latest"; then
@@ -70,21 +71,23 @@ jobs:
         name: Image meta
         id: meta
         uses: docker/metadata-action@v4
+        env:
+          CUSTOM_TAG: ${{ inputs.customTag || env.DOCKER_IMAGE_TAG }}
         with:
           flavor: |
             latest=true
           images: |
             ghcr.io/epam/hub-toolbox
           tags: |
-            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }},suffix=-base
-            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,value=base,enable=${{ github.event.inputs.customTag == '' }}
-            type=raw,value=${{ github.event.inputs.customTag }},enable=${{ github.event.inputs.customTag != '' }},prefix=custom-
+            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ inputs.customTag == '' }},suffix=-base
+            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ inputs.customTag == '' }}
+            type=raw,value=base,enable=${{ inputs.customTag == '' }}
+            type=raw,value=${{ env.CUSTOM_TAG }},enable=${{ inputs.customTag != '' }},prefix=custom-,suffix=-base
 
       -
         name: 'Outputs'
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
-          echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
+          echo "HUB Extensions: ${{ inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
           echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
