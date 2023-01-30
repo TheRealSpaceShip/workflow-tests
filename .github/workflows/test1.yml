@@ -1,9 +1,9 @@
-name: 'Test'
+name: 'Test1'
 
 on:
   push:
     tags:
-    - 'base'
+    - 'base1'
   workflow_dispatch:
     inputs:
       hubVersion:
@@ -83,26 +83,8 @@ jobs:
 
       -
         name: 'Outputs'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.event.head_commit.author.name || github.actor }}
-          USEREMAIL: ${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
           echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
-
-          # Setup git
-          git config user.name "${{ env.USERNAME }}"
-          git config user.email "${{ env.USEREMAIL }}"
-          gh auth setup-git
-
-          # Create git tag and push it
-          TAG="${{ steps.meta.outputs.version }}"
-          git tag -a "$TAG" -m "Release $TAG"
-          git tag -a "base1" -m "Release base1" --force
-          git push origin "$TAG"
-          git push origin "base1" --force
-
-
