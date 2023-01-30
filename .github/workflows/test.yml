@@ -38,9 +38,13 @@ jobs:
       -
         id: 'versions'
         name: 'Calculate versions'
+        env:
+          HUB_CTL_VERSION: ${{ github.event.inputs.hubVersion || 'latest' }}
+          HUB_STATE_VERSION: ${{ github.event.inputs.hubStateVersion || 'latest' }}
+          HUB_EXT_REF: ${{ github.event.inputs.hubExtRef || 'stable' }}
         run: |
           HUB_CTL_VERSION="${{ github.event.inputs.hubVersion }}"
-          if test "$HUB_CTL_VERSION" = "latest" || test -z "$HUB_CTL_VERSION"; then
+          if test "$HUB_CTL_VERSION" = "latest"; then
             export HUB_CTL_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hubctl/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
             if test -z "$HUB_CTL_VERSION"; then
               echo "Hub CLI version can't be empty"
@@ -48,7 +52,7 @@ jobs:
             fi
           fi
           HUB_STATE_VERSION="${{ github.event.inputs.hubStateVersion }}"
-          if test "$HUB_STATE_VERSION" = "latest" || test -z "$HUB_STATE_VERSION"; then
+          if test "$HUB_STATE_VERSION" = "latest"; then
             HUB_STATE_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hub-state/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
             if test -z "$HUB_STATE_VERSION"; then
               echo "Hub State extension version can't be empty"
@@ -81,6 +85,8 @@ jobs:
         name: 'Outputs'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.event.head_commit.author.name || github.actor }}
+          USEREMAIL: ${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
           echo "HUB Extensions: ${{ github.event.inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
@@ -88,8 +94,6 @@ jobs:
           echo "Tags: ${{ steps.meta.outputs.tags }}"
 
           # Setup git
-          USERNAME="${{ github.event.head_commit.author.name || github.actor }}"
-          USEREMAIL="${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}"
           git config user.name "$USERNAME"
           git config user.email "$USEREMAIL"
           gh auth setup-git
