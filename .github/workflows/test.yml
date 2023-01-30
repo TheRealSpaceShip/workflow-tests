@@ -97,18 +97,19 @@ jobs:
           echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
 
-          # Setup git
+          echo "Setup git"
           git config user.name "${{ env.USERNAME }}"
           git config user.email "${{ env.USEREMAIL }}"
           gh auth setup-git
 
-          # Create git tag and push it
+          echo "Create git tag and push it"
           TAG="${{ steps.meta.outputs.version }}"
           git tag -a "$TAG" -m "Release $TAG"
           git tag -a "base1" -m "Release base1" --force
           git push origin "$TAG"
           git push origin "base1" --force
 
+          echo "Start workflow test1"
           gh workflow run test1.yml
 
 
