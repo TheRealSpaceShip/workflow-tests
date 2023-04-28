@@ -6,110 +6,55 @@ on:
     - 'base'
   workflow_dispatch:
     inputs:
-      hubVersion:
-        description: 'Hub CLI release version. Use "latest" or release number (ex. 1.0.0).'
-        required: true
-        default: 'latest'
-      hubStateVersion:
-        description: 'Hub State release version. Use "latest" or release number (ex. 1.0.0).'
-        required: true
-        default: 'latest'
-      hubExtRef:
-        description: 'Hub Extensions git ref.'
-        required: true
-        default: 'stable'
-      hubExtCommit:
-        description: 'Hub Extensions commit hash. If empty Hub Extensions git ref is used.'
+      stringInput:
+        description: 'This is string input'
         required: false
-        default: ''
-      customTag:
-        description: 'Custom base image tag.'
+        default: 'stringInput'
+      booleanInput:
+        type: boolean
+        description: 'This is boolean input'
         required: false
-        default: ''
+        default: false
+      choiseInput:
+        type: choice
+        description: 'This is choise input'
+        required: false
+        options:
+          - choise1
+          - choise2
+          - choise3
+        default: 'choise2'
 
 jobs:
-  build:
-    runs-on: 'ubuntu-latest'
 
+  test-condition:
+    runs-on: 'ubuntu-latest'
+    if: inputs.booleanInput
     steps:
       -
-        name: 'Checkout'
-        uses: 'actions/checkout@v3'
-
-      -
-        id: 'versions'
-        name: 'Calculate versions'
+        id: 'test'
+        name: 'Test inputs with conditions'
         env:
-          HUB_CTL_VERSION: ${{ inputs.hubVersion || 'latest' }}
-          HUB_STATE_VERSION: ${{ inputs.hubStateVersion || 'latest' }}
-          HUB_EXT_REF: ${{ inputs.hubExtRef || 'stable' }}
+          STRING_INPUT: ${{ inputs.stringInput }}
+          BOOLEAN_INPUT: ${{ inputs.booleanInput }}
+          CHOISE_INPUT: ${{ inputs.choiseInput }}
         run: |
-          HUB_CTL_VERSION="${{ env.HUB_CTL_VERSION }}"
-          if test "$HUB_CTL_VERSION" = "latest"; then
-            export HUB_CTL_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hubctl/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
-            if test -z "$HUB_CTL_VERSION"; then
-              echo "Hub CLI version can't be empty"
-              exit 1
-            fi
-          fi
-          HUB_STATE_VERSION="${{ env.HUB_STATE_VERSION }}"
-          if test "$HUB_STATE_VERSION" = "latest"; then
-            HUB_STATE_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/epam/hub-state/releases/latest" | jq -crM '.tag_name | select(.)' | cut -c 2-)
-            if test -z "$HUB_STATE_VERSION"; then
-              echo "Hub State extension version can't be empty"
-              exit 1
-            fi
-          fi
-          HUB_EXTENSIONS_VERSION=$(git ls-remote -q https://github.com/epam/hub-extensions.git "${{ env.HUB_EXT_REF }}" 2>/dev/null | cut -c-7)
+          echo "STRING_INPUT=$STRING_INPUT"
+          echo "BOOLEAN_INPUT=$BOOLEAN_INPUT"
+          echo "CHOISE_INPUT=$CHOISE_INPUT"
 
-          echo "HUB_CTL_VERSION=$HUB_CTL_VERSION" >> $GITHUB_ENV
-          echo "HUB_EXTENSIONS_VERSION=$HUB_EXTENSIONS_VERSION" >> $GITHUB_ENV
-          echo "HUB_STATE_VERSION=$HUB_STATE_VERSION" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_TAG=$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_ENV
-
+  test:
+    runs-on: 'ubuntu-latest'
+    if: '!inputs.booleanInput'
+    steps:
       -
-        name: Image meta
-        id: meta
-        uses: docker/metadata-action@v4
+        id: 'test'
+        name: 'Test inputs'
         env:
-          CUSTOM_TAG: ${{ inputs.customTag || env.DOCKER_IMAGE_TAG }}
-        with:
-          flavor: |
-            latest=true
-          images: |
-            ghcr.io/epam/hub-toolbox
-          tags: |
-            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ inputs.customTag == '' }},suffix=-base
-            type=raw,value=${{ env.DOCKER_IMAGE_TAG }},enable=${{ inputs.customTag == '' }}
-            type=raw,value=base,enable=${{ inputs.customTag == '' }}
-            type=raw,value=${{ env.CUSTOM_TAG }},enable=${{ inputs.customTag != '' }},prefix=custom-,suffix=-base
-
-      -
-        name: 'Outputs'
-        if: ${{ inputs.customTag == '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.event.head_commit.author.name || github.actor }}
-          USEREMAIL: ${{ github.event.head_commit.author.email || format('{0}@users.noreply.github.com', github.actor) }}
+          STRING_INPUT: ${{ inputs.stringInput }}
+          BOOLEAN_INPUT: ${{ inputs.booleanInput }}
+          CHOISE_INPUT: ${{ inputs.choiseInput }}
         run: |
-          echo "HUB CLI: ${{ env.HUB_CTL_VERSION }}"
-          echo "HUB Extensions: ${{ inputs.hubExtCommit || env.HUB_EXTENSIONS_VERSION }}"
-          echo "HUB State: ${{ env.HUB_STATE_VERSION }}"
-          echo "Tags: ${{ steps.meta.outputs.tags }}"
-
-          echo "Setup git"
-          git config user.name "${{ env.USERNAME }}"
-          git config user.email "${{ env.USEREMAIL }}"
-          gh auth setup-git
-
-          echo "Create git tag and push it"
-          TAG="${{ steps.meta.outputs.version }}"
-          git tag -a "$TAG" -m "Release $TAG"
-          git tag -a "base1" -m "Release base1" --force
-          git push origin "$TAG"
-          git push origin "base1" --force
-
-          echo "Start workflow test1"
-          gh workflow run test1.yml
-
-
+          echo "STRING_INPUT=$STRING_INPUT"
+          echo "BOOLEAN_INPUT=$BOOLEAN_INPUT"
+          echo "CHOISE_INPUT=$CHOISE_INPUT"
