@@ -1,0 +1,74 @@
+name: 'Certbot'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rotate_ssl_cert:
+    needs: build_crt_rotation_image
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epam/hub-ssl-rotator-env:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Execute SSL rotation script
+      env:
+        RESOURCE_GROUP_NAME: ${{ inputs.az_resource_group_name || 'epmp-agst'}}
+        CONTAINER_APP_ENV_NAME: ${{ inputs.az_container_app_env_name || 'bubbles-devops-delivery' }}
+        HOST_NAME: ${{ inputs.az_container_app_env_hostname || 'bubbles.devops.delivery' }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        STAGING: ${{ inputs.certbot_staging }}
+      shell: bash
+      run: |
+        #!/bin/bash -ex
+
+        USER_EMAIL="devops@epam.com"
+        CONFIG_DIR=etc
+        LOGS_DIR=logs
+
+        mkdir -p "$LOGS_DIR"
+        mkdir -p "$CONFIG_DIR"
+
+        cat > "$CONFIG_DIR/azure.ini" <<EOF
+        dns_azure_msi_client_id = $AZURE_CLIENT_ID
+        dns_azure_zone1 = $HOST_NAME:/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME
+        EOF
+
+        # shellcheck disable=SC2086
+        certbot certonly --staging \
+          --authenticator dns-azure \
+          --preferred-challenges dns \
+          --noninteractive \
+          --email "$USER_EMAIL" \
+          --agree-tos \
+          --dns-azure-config "$CONFIG_DIR/azure.ini" \
+          --logs-dir "$LOGS_DIR" \
+          --work-dir "$CONFIG_DIR" \
+          --config-dir "$CONFIG_DIR" \
+          -d "*.${HOST_NAME}"
+
+        openssl pkcs12 \
+          -inkey "etc/live/$HOST_NAME/privkey.pem" \
+          -in "etc/live/$HOST_NAME/fullchain.pem" \
+          -export -out "etc/live/$HOST_NAME/cert.pfx" \
+          -macalg SHA1 \
+          -keypbe PBE-SHA1-3DES \
+          -certpbe PBE-SHA1-3DES \
+          -passout pass:
