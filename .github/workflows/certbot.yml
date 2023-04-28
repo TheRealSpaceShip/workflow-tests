@@ -52,7 +52,8 @@ jobs:
         mkdir -p "$CONFIG_DIR"
 
         cat > "$CONFIG_DIR/azure.ini" <<EOF
-        dns_azure_msi_client_id = $AZURE_CLIENT_ID
+        # dns_azure_msi_client_id = $AZURE_CLIENT_ID
+        dns_azure_msi_system_assigned = true
         dns_azure_zone1 = $HOST_NAME:/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME
         EOF
 
