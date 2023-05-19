@@ -1,9 +1,6 @@
 name: 'Test'
 
 on:
-  push:
-    tags:
-    - 'base'
   workflow_dispatch:
     inputs:
       stringInput:

@@ -1,9 +1,6 @@
 name: 'Test1'
 
 on:
-  push:
-    tags:
-    - 'base1'
   workflow_dispatch:
     inputs:
       hubVersion:
