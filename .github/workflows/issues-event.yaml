@@ -1,0 +1,20 @@
+name: Issue Notification
+run-name: "Issue #${{ github.event.issue.number }} ${{github.event.action}}"
+on:
+  issues:
+    types: [opened, edited, closed, reopened, assigned]
+
+permissions:
+  contents: read
+
+jobs:
+  issue-event:
+    name: Issue Event
+    runs-on: ubuntu-latest
+    steps:
+    - name: event
+      run: |
+        echo "${{github.event}}" | jq .
+    - name: issue-event
+      run: |
+        echo "${{github.event.issue}}" | jq .
