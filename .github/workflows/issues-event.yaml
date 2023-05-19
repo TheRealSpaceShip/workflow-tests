@@ -14,7 +14,7 @@ jobs:
     steps:
     - name: event
       run: |
-        echo "${{toJSON(github.event)}}" | jq .
+        echo "${{toJSON(github.event)}}"
     - name: issue-event
       run: |
-        echo "${{toJSON(github.event.issue)}}" | jq .
+        echo "${{toJSON(github.event.issue)}}"
