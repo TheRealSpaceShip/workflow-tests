@@ -29,6 +29,7 @@ jobs:
           ls -la
           env | sort
           hubctl version
+          echo "${{ github.workspace }}"
 
       - name: Outputs
         id: test
