@@ -12,26 +12,38 @@ jobs:
     outputs:
       stack-outputs: ${{ steps.stack-outputs.outputs.stack-outputs }}
     env:
-      HUB_WORKDIR: ${{ github.workspace }}/stacks/second
       HUB_AUTOCONFIGURE: "0"
       HUB_INTERACTIVE: "0"
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
+      - name: Test
+        run: |-
+          echo '${{ github.workspace }}'
+          ls -la ${{ github.workspace }}
+
       - name: Init stack
+        env:
+          HUB_WORKDIR: ${{ github.workspace }}/stacks/second
         run: |-
           hubctl stack init -f '${{ github.workspace }}/stacks/second/hub.yaml' -V
 
       - name: Configure stack
+        env:
+          HUB_WORKDIR: ${{ github.workspace }}/stacks/second
         run: |-
           hubctl stack configure
 
       - name: Deploy stack
+        env:
+          HUB_WORKDIR: ${{ github.workspace }}/stacks/second
         run: |-
           hubctl stack deploy
 
       - name: Outputs
         id: stack-outputs
+        env:
+          HUB_WORKDIR: ${{ github.workspace }}/stacks/second
         run: |-
           echo hubctl-show="$(hubctl show --format json | jq -crM)" >> $GITHUB_OUTPUT
