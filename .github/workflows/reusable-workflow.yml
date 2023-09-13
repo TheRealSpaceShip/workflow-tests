@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+    inputs:
+      input1:
+        type: string
+        required: true
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epam/hub-toolbox:base
+      volumes:
+        - /workspace:${{ github.workspace }}
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: Test commands
+        run: |-
+          pwd
+          ls -la
+          env | sort
+
+      - name: Outputs
+        run: |-
+          echo test-output="this is test output with input value ${{ inputs.input1 }}" >> $GITHUB_OUTPUT

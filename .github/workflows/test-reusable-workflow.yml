@@ -1,0 +1,33 @@
+name: 'Kubeflow on AWS'
+on:
+  workflow_dispatch:
+    inputs:
+      my-input:
+        type: string
+        required: true
+
+jobs:
+  test-reusable-workflow:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      input1: ${{ inputs.my-input }}
+
+  test-outputs:
+    runs-on: ubuntu-latest
+    needs: test-reusable-workflow
+    container:
+      image: ghcr.io/epam/hub-toolbox:aws
+      volumes:
+        - /workspace:${{ github.workspace }}
+    steps:
+    - name: Git clone the repository
+      uses: actions/checkout@v3
+
+    - name: Test
+      env:
+        TEST_OUTPUT: ${{ steps.test-reusable-workflow.outputs.test-output }}
+      run: |-
+        echo "${{ steps.test-reusable-workflow.outputs.test-output }}"
+        echo "Again $TEST_OUTPUT"
+
+
