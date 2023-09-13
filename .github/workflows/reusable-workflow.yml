@@ -8,7 +8,10 @@ on:
 jobs:
   reusable:
     runs-on: ubuntu-latest
-    container: ghcr.io/epam/hub-toolbox:base
+    container:
+      image: ghcr.io/epam/hub-toolbox:base
+      volumes:
+        - /workspace:${{ github.workspace }}
     outputs:
       stack-outputs: ${{ steps.stack-outputs.outputs.stack-outputs }}
     env:
@@ -20,8 +23,9 @@ jobs:
 
       - name: Test
         run: |-
-          echo '${{ github.workspace }}'
-          ls -la ${{ github.workspace }}
+          echo "$GITHUB_WORKSPACE"
+          ls -la /workspace || echo
+          ls -la "$GITHUB_WORKSPACE" || echo
 
       - name: Init stack
         env:
