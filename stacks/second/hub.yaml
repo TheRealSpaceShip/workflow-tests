@@ -1,0 +1,13 @@
+kind: stack                                                                   # mandatory, defines a stack manifest
+version: 1                                                                    # stack manifest schema version
+meta:                                                                         # optional
+  name: My second deployment                                                   # optional human readable name
+
+components:                                                                   # mandatory, list of components
+  - name: hello-hubctl                                                        # mandatory, name of the component
+    source:                                                                   # mandatory, component source
+      dir: components/hello-hubctl                                            # mandatory, local path where to find component
+      git:                                                                    # optional, git source to download component from
+        remote: https://github.com/epam/hubctl.io.git                         # mandatory, git repository remote url
+        subDir: docs/tutorials/010-hubctl-stack-init/components/hello-hubctl  # mandatory, subdirectory in the repository
+        ref: main                                                             # optional, git reference (branch, tag, commit)

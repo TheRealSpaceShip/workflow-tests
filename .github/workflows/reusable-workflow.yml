@@ -1,37 +1,37 @@
 name: Reusable workflow
 on:
   workflow_call:
-    inputs:
-      input1:
-        type: string
-        required: true
     outputs:
-      test-output:
-        description: "LOL KEK"
-        value: ${{ jobs.reusable.outputs.test-output }}
+      stack-outputs:
+        value: ${{ jobs.reusable.outputs.stack-outputs }}
 
 jobs:
   reusable:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/epam/hub-toolbox:base
-      volumes:
-        - /workspace:${{ github.workspace }}
+    container: ghcr.io/epam/hub-toolbox:base
     outputs:
-      test-output: ${{ steps.test.outputs.test-output }}
+      stack-outputs: ${{ steps.stack-outputs.outputs.stack-outputs }}
+    env:
+      HUB_WORKDIR: ${{ github.workspace }}/stacks/second
+      HUB_AUTOCONFIGURE: "0"
+      HUB_INTERACTIVE: "0"
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
-      - name: Test commands
+      - name: Init stack
         run: |-
-          pwd
-          ls -la
-          env | sort
-          hubctl version
-          echo "${{ github.workspace }}"
+          hubctl stack init
+
+      - name: Configure stack
+        run: |-
+          hubctl stack configure
+
+      - name: Deploy stack
+        run: |-
+          hubctl stack deploy
 
       - name: Outputs
-        id: test
+        id: stack-outputs
         run: |-
-          echo test-output="this is test output with input value ${{ inputs.input1 }}" >> $GITHUB_OUTPUT
+          echo hubctl-show="$(hubctl show --format json | jq -crM)" >> $GITHUB_OUTPUT
