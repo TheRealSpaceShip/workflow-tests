@@ -21,7 +21,7 @@ jobs:
 
       - name: Init stack
         run: |-
-          hubctl stack init -f '${{ github.workspace }}/stacks/second/hub.yaml'
+          hubctl stack init -f '${{ github.workspace }}/stacks/second/hub.yaml' -V
 
       - name: Configure stack
         run: |-
