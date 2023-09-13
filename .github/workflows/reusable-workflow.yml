@@ -5,6 +5,10 @@ on:
       input1:
         type: string
         required: true
+    outputs:
+      test-output:
+        description: "LOL KEK"
+        value: ${{ jobs.reusable.outputs.test-output }}
 
 jobs:
   reusable:
@@ -14,7 +18,7 @@ jobs:
       volumes:
         - /workspace:${{ github.workspace }}
     outputs:
-      reusable-output: ${{ steps.test.outputs.test-output }}
+      test-output: ${{ steps.test.outputs.test-output }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
