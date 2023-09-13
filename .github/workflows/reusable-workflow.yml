@@ -1,3 +1,4 @@
+name: Reusable workflow
 on:
   workflow_call:
     inputs:
@@ -6,12 +7,14 @@ on:
         required: true
 
 jobs:
-  foundation:
+  reusable:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/epam/hub-toolbox:base
       volumes:
         - /workspace:${{ github.workspace }}
+    outputs:
+      reusable-output: ${{ steps.test.outputs.test-output }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
@@ -21,7 +24,9 @@ jobs:
           pwd
           ls -la
           env | sort
+          hubctl version
 
       - name: Outputs
+        id: test
         run: |-
           echo test-output="this is test output with input value ${{ inputs.input1 }}" >> $GITHUB_OUTPUT

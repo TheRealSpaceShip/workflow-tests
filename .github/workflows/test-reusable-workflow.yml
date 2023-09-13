@@ -1,4 +1,4 @@
-name: 'Kubeflow on AWS'
+name: 'Test reusable workflow'
 on:
   workflow_dispatch:
     inputs:
@@ -25,9 +25,9 @@ jobs:
 
     - name: Test
       env:
-        TEST_OUTPUT: ${{ steps.test-reusable-workflow.outputs.test-output }}
+        TEST_OUTPUT: ${{ needs.test-reusable-workflow.outputs.reusable-output }}
       run: |-
-        echo "${{ steps.test-reusable-workflow.outputs.test-output }}"
+        echo "${{ needs.test-reusable-workflow.outputs.reusable-output }}"
         echo "Again $TEST_OUTPUT"
 
 
