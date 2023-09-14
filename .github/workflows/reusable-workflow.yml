@@ -16,6 +16,7 @@ jobs:
       stack-outputs: ${{ steps.stack-outputs.outputs.stack-outputs }}
     env:
       HUB_AUTOCONFIGURE: "0"
+      INTERACTIVE: "0"
       HUB_INTERACTIVE: "0"
       HUB_DEPLOY_PROFILE: "local"
     steps:
