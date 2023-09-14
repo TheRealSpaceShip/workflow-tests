@@ -17,6 +17,7 @@ jobs:
     env:
       HUB_AUTOCONFIGURE: "0"
       HUB_INTERACTIVE: "0"
+      HUB_DEPLOY_PROFILE: "local"
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
