@@ -17,20 +17,22 @@ jobs:
     env:
       HUB_AUTOCONFIGURE: "0"
       HUB_INTERACTIVE: "0"
-      HUB_WORKDIR: ${{ github.workspace }}/stacks/second
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
       - name: Init stack
+        working-directory: ./stacks/second
         run: |-
-          hubctl stack init -f "$GITHUB_WORKSPACE/stacks/second/hub.yaml"
+          hubctl stack init
 
       - name: Configure stack
+        working-directory: ./stacks/second
         run: |-
           hubctl stack configure
 
       - name: Deploy stack
+        working-directory: ./stacks/second
         run: |-
           hubctl stack deploy
 
