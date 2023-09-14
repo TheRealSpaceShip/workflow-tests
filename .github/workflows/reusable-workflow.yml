@@ -42,4 +42,4 @@ jobs:
         id: stack-outputs
         working-directory: ./stacks/second
         run: |-
-          echo hubctl-show="$(hubctl show --format json | jq -crM)" >> $GITHUB_OUTPUT
+          echo stack-outputs="$(hubctl show --format json | jq -crM)" >> $GITHUB_OUTPUT
