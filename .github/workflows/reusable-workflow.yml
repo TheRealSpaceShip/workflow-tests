@@ -33,15 +33,15 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
-      - name: Init
+      - name: Stack init
         working-directory: ${{ inputs.workdir }}
         run: hubctl stack init
 
-      - name: Configure
+      - name: Stack configure
         working-directory: ${{ inputs.workdir }}
         run: hubctl stack configure
 
-      - name: Deploy stack
+      - name: Stack ${{ inputs.verb }}
         working-directory: ${{ inputs.workdir }}
         run: hubctl stack ${{ inputs.verb }}
 
