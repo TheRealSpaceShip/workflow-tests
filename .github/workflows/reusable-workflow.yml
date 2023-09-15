@@ -16,10 +16,11 @@ on:
         default: ghcr.io/epam/hub-toolbox:base
     outputs:
       stack-outputs:
-        value: ${{ jobs.reusable.outputs.stack-outputs }}
+        value: ${{ jobs.hubctl.outputs.stack-outputs }}
 
 jobs:
-  reusable:
+  hubctl:
+    name: "Running hubctl"
     runs-on: ubuntu-latest
     container: ${{ inputs.toolbox-image }}
     outputs:
