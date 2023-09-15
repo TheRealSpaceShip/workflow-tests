@@ -1,19 +1,47 @@
 name: 'Test reusable workflow'
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      verb:
+        type: choice
+        options:
+          - deploy
+          - undeploy
+        description: Deploy or undeploy
+        default: deploy
+      toolbox-image:
+        type: choice
+        options:
+          - ghcr.io/epam/hub-toolbox:base
+          - ghcr.io/epam/hub-toolbox:aws
+          - ghcr.io/epam/hub-toolbox:gcp
+          - ghcr.io/epam/hub-toolbox:azure
+        description: Toolbox image
+        default: ghcr.io/epam/hub-toolbox:base
 
 jobs:
-  simple-stack:
+  first-stack:
     uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      workdir: ./stacks
+      verb: ${{ inputs.verb }}
+      toolbox-image: ${{ inputs.toolbox-image }}
+
+  second-stack:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      workdir: ./stacks/second
+      verb: ${{ inputs.verb }}
+      toolbox-image: ${{ inputs.toolbox-image }}
 
   test-outputs:
     runs-on: ubuntu-latest
-    needs: simple-stack
-    container: ghcr.io/epam/hub-toolbox:aws
+    needs: [first-stack, second-stack]
     steps:
     - name: Git clone the repository
       uses: actions/checkout@v3
 
     - name: Show outputs
       run: |-
-        echo "${{ needs.simple-stack.outputs.stack-outputs }} | jq '.'"
+        echo "${{ needs.first-stack.outputs.stack-outputs }}"
+        echo "${{ needs.second-stack.outputs.stack-outputs }}"

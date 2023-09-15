@@ -1,6 +1,19 @@
 name: Reusable workflow
 on:
   workflow_call:
+    inputs:
+      verb:
+        type: string
+        description: 'Action to run: deploy or undeploy'
+        default: deploy
+      workdir:
+        type: string
+        description: Directory where to run hubctl commands
+        required: true
+      toolbox-image:
+        type: string
+        description: Toolbox image with tag
+        default: ghcr.io/epam/hub-toolbox:base
     outputs:
       stack-outputs:
         value: ${{ jobs.reusable.outputs.stack-outputs }}
@@ -8,10 +21,7 @@ on:
 jobs:
   reusable:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/epam/hub-toolbox:base
-      volumes:
-        - /workspace:${{ github.workspace }}
+    container: ${{ inputs.toolbox-image }}
     outputs:
       stack-outputs: ${{ steps.stack-outputs.outputs.stack-outputs }}
     env:
@@ -23,23 +33,20 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
-      - name: Init stack
-        working-directory: ./stacks/second
-        run: |-
-          hubctl stack init
+      - name: Init
+        working-directory: ${{ inputs.workdir }}
+        run: hubctl stack init
 
-      - name: Configure stack
-        working-directory: ./stacks/second
-        run: |-
-          hubctl stack configure
+      - name: Configure
+        working-directory: ${{ inputs.workdir }}
+        run: hubctl stack configure
 
       - name: Deploy stack
-        working-directory: ./stacks/second
-        run: |-
-          hubctl stack deploy
+        working-directory: ${{ inputs.workdir }}
+        run: hubctl stack ${{ inputs.verb }}
 
       - name: Outputs
         id: stack-outputs
-        working-directory: ./stacks/second
+        working-directory: ${{ inputs.workdir }}
         run: |-
           echo stack-outputs="$(hubctl show --format json | jq -crM)" >> $GITHUB_OUTPUT
