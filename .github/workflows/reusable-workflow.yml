@@ -41,8 +41,9 @@ jobs:
           name: dotenv
           path: ${{ github.workspace }}
 
-      - run: |
-          cat "$GITHUB_WORKSPACE/.env" >> $GITHUB_ENV
+      - run: cat "$GITHUB_WORKSPACE/.env" >> $GITHUB_ENV
+
+      - run: env | sort | grep 'HUB_'
 
       - name: Stack init
         working-directory: ${{ inputs.workdir }}
