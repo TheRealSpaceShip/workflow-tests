@@ -20,19 +20,40 @@ on:
         default: ghcr.io/epam/hub-toolbox:base
 
 jobs:
+  dotenv:
+    runs-on: ubuntu-latest
+    outputs:
+      dotenv: ${{ steps.dotenv.outputs.dotenv }}
+    steps:
+      - id: dotenv
+        name: Get dotenv files
+        run: |
+          cat << EOF >> test.env
+            A=1
+            B=2
+            C=3
+            D=4
+            E=5
+          EOF
+          echo "dotenv=$(cat test.env)" >> $GITHUB_OUTPUT
+
   first-stack:
     uses: ./.github/workflows/reusable-workflow.yml
+    needs: dotenv
     with:
       workdir: ./stacks
       verb: ${{ inputs.verb }}
       toolbox-image: ${{ inputs.toolbox-image }}
+      dotenv: ${{ needs.dotenv.outputs.dotenv }}
 
   second-stack:
     uses: ./.github/workflows/reusable-workflow.yml
+    needs: dotenv
     with:
       workdir: ./stacks/second
       verb: ${{ inputs.verb }}
       toolbox-image: ${{ inputs.toolbox-image }}
+      dotenv: ${{ needs.dotenv.outputs.dotenv }}
 
   test-outputs:
     runs-on: ubuntu-latest

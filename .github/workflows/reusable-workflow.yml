@@ -14,6 +14,8 @@ on:
         type: string
         description: Toolbox image with tag
         default: ghcr.io/epam/hub-toolbox:base
+      dotenv:
+        type: string
     outputs:
       stack-outputs:
         value: ${{ jobs.hubctl.outputs.stack-outputs }}
@@ -33,6 +35,10 @@ jobs:
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
+
+      - name: Dotenv
+        working-directory: ${{ inputs.workdir }}
+        run: echo "${{ inputs.dotenv }}"
 
       - name: Stack init
         working-directory: ${{ inputs.workdir }}
