@@ -20,6 +20,9 @@ on:
       stack-outputs:
         value: ${{ jobs.hubctl.outputs.stack-outputs }}
 
+env:
+  KEK: LOL
+
 jobs:
   hubctl:
     name: "Running hubctl"
