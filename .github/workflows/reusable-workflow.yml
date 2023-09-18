@@ -20,9 +20,6 @@ on:
       stack-outputs:
         value: ${{ jobs.hubctl.outputs.stack-outputs }}
 
-env:
-  KEK: LOL
-
 jobs:
   hubctl:
     name: "Running hubctl"
@@ -45,8 +42,7 @@ jobs:
           path: ${{ github.workspace }}
 
       - run: |
-          echo "$KEK"
-          echo "${{ env.KEK }}"
+          cat "$GITHUB_WORKSPACE/.env" >> $GITHUB_ENV
 
       - name: Stack init
         working-directory: ${{ inputs.workdir }}

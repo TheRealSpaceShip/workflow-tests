@@ -27,11 +27,11 @@ jobs:
         name: Get dotenv files
         run: |
           cat << EOF >> $GITHUB_WORKSPACE/.env
-            A=1
-            B=2
-            C=3
-            D=4
-            E=5
+            HUB_A=1
+            HUB_B=2
+            HUB_C=3
+            HUB_D=4
+            HUB_E=5
           EOF
       - uses: actions/upload-artifact@v3
         with:
