@@ -39,7 +39,7 @@ jobs:
           path: ${{ github.workspace }}/.env
 
   first-stack:
-    uses: ./.github/reusable/reusable-workflow.yml
+    uses: ./.github/workflows/reusable/reusable-workflow.yml
     needs: dotenv
     with:
       workdir: ./stacks
@@ -47,7 +47,7 @@ jobs:
       toolbox-image: ${{ inputs.toolbox-image }}
 
   second-stack:
-    uses: ./.github/reusable/reusable-workflow.yml
+    uses: ./.github/workflows/reusable/reusable-workflow.yml
     needs: dotenv
     with:
       workdir: ./stacks/second
