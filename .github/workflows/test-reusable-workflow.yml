@@ -22,8 +22,6 @@ on:
 jobs:
   dotenv:
     runs-on: ubuntu-latest
-    outputs:
-      dotenv: ${{ steps.dotenv.outputs.dotenv }}
     steps:
       - id: dotenv
         name: Get dotenv files
@@ -35,11 +33,10 @@ jobs:
             D=4
             E=5
           EOF
-          echo "dotenv=$(cat test.env)" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v3
         with:
           name: dotenv
-          path: ${{ env.GITHUB_WORKSPACE }}/.env
+          path: ${{ github.workspace }}/.env
 
   first-stack:
     uses: ./.github/workflows/reusable-workflow.yml
@@ -48,7 +45,6 @@ jobs:
       workdir: ./stacks
       verb: ${{ inputs.verb }}
       toolbox-image: ${{ inputs.toolbox-image }}
-      dotenv: ${{ needs.dotenv.outputs.dotenv }}
 
   second-stack:
     uses: ./.github/workflows/reusable-workflow.yml
@@ -57,7 +53,6 @@ jobs:
       workdir: ./stacks/second
       verb: ${{ inputs.verb }}
       toolbox-image: ${{ inputs.toolbox-image }}
-      dotenv: ${{ needs.dotenv.outputs.dotenv }}
 
   test-outputs:
     runs-on: ubuntu-latest

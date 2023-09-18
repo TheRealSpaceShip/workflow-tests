@@ -39,9 +39,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: dotenv
-          path: ${{ env.GITHUB_WORKSPACE }}/.env
+          path: ${{ github.workspace }}/.env
 
-      - run: cat ${{ env.GITHUB_WORKSPACE }}/.env
+      - run: cat "$GITHUB_WORKSPACE/.env"
 
       - name: Stack init
         working-directory: ${{ inputs.workdir }}
