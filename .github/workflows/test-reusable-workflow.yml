@@ -19,6 +19,9 @@ on:
         description: Toolbox image
         default: ghcr.io/epam/hub-toolbox:base
 
+env:
+  KEK: LOL
+
 jobs:
   dotenv:
     runs-on: ubuntu-latest

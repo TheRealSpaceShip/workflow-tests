@@ -41,7 +41,9 @@ jobs:
           name: dotenv
           path: ${{ github.workspace }}
 
-      - run: cat "$GITHUB_WORKSPACE/.env"
+      - run: |
+          echo "$KEK"
+          echo "${{ env.KEK }}"
 
       - name: Stack init
         working-directory: ${{ inputs.workdir }}
