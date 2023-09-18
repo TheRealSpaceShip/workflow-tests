@@ -39,7 +39,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: dotenv
-          path: ${{ github.workspace }}/.env
+          path: ${{ github.workspace }}
 
       - run: cat "$GITHUB_WORKSPACE/.env"
 
