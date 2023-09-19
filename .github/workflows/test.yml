@@ -22,9 +22,6 @@ on:
           - choise3
         default: 'choise2'
 
-env:
-  KEK: Its $LOL
-
 jobs:
   json:
     runs-on: 'ubuntu-latest'
@@ -44,6 +41,8 @@ jobs:
         run: |
           echo "LOL=test" >> $GITHUB_ENV
       - name: Test
+        env:
+          KEK: Its $LOL
         run: |
           echo "${{ needs.json.outputs.myjson }}"
           echo "$KEK"
