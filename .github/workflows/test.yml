@@ -31,10 +31,13 @@ jobs:
     runs-on: 'ubuntu-latest'
     environment: ${{ inputs.environment }}
     steps:
+      - name: Before
+        run: |
+          echo "$MY_ENV_VAR_1"
       - name: Test
         run: |
           echo '${{ toJson(vars) }}' | jq -crM 'to_entries | map("\(.key)=\"\(.value|tostring)\"") | .[]' >> $GITHUB_ENV
-      - name: Read Env var
+      - name: After
         run: |
           echo "$MY_ENV_VAR_1"
 
