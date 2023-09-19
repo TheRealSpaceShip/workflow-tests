@@ -26,15 +26,25 @@ env:
   TEST_ENV: "This is test env with var $TEST_VAR"
 
 jobs:
+  json:
+    runs-on: 'ubuntu-latest'
+    outputs:
+      myjson: ${{ steps.myjson.outputs.json }}
+    steps:
+      - id: myjson
+        name: JSON
+        run: |
+          echo "json=\"{\"test\":\"test value\"}\"" >> $GITHUB_OUTPUT
+
   test:
+    needs: json
     runs-on: 'ubuntu-latest'
     steps:
       - name: Test env var
         env:
           TEST_VAR: Im test var
         run: |
-          echo "Plain  = $TEST_ENV"
-          echo "Github = ${{ env.TEST_ENV }}"
+          echo "${{ needs.json.outputs.myjson.test }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
