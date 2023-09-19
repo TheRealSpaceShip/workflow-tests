@@ -28,22 +28,23 @@ on:
 
 jobs:
   test:
+    name: Use variable ${{ vars.MY_ENV_VAR }}
     runs-on: 'ubuntu-latest'
     environment: ${{ inputs.environment }}
     steps:
-      - name: Before
+      - name: Before ${{ vars.MY_ENV_VAR }}
         run: |
-          echo "Before = $MY_ENV_VAR_1"
-          echo "Before = ${{ env.MY_ENV_VAR_1 }}"
-      - name: Test
+          echo "Before = $MY_ENV_VAR"
+          echo "Before = ${{ env.MY_ENV_VAR }}"
+      - name: Test ${{ vars.MY_ENV_VAR }}
         run: |
           echo '${{ toJson(vars) }}' | jq -crM 'to_entries | map("\(.key)=\"\(.value|tostring)\"") | .[]' >> $GITHUB_ENV
-          echo "right after = $MY_ENV_VAR_1"
-          echo "right after = ${{ env.MY_ENV_VAR_1 }}"
-      - name: After
+          echo "right after = $MY_ENV_VAR"
+          echo "right after = ${{ env.MY_ENV_VAR }}"
+      - name: After ${{ vars.MY_ENV_VAR }}
         run: |
           echo "After = $MY_ENV_VAR_1"
-          echo "After = ${{ env.MY_ENV_VAR_1 }}"
+          echo "After = ${{ env.MY_ENV_VAR }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
