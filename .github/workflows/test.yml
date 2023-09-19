@@ -39,8 +39,10 @@ jobs:
     steps:
       - name: Pre-Test
         run: |
-          echo "LOL=KEK" >> $GITHUB_ENV
+          echo "LOL=$KEK" >> $GITHUB_ENV
       - name: Test
+        env:
+          KEK: Its KEK
         run: |
           echo "${{ needs.json.outputs.myjson }}"
           echo "$LOL"
