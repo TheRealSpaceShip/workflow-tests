@@ -32,12 +32,14 @@ jobs:
         name: JSON
         run: |
           echo "json=\"{\"test\":\"test value\"}\"" >> $GITHUB_OUTPUT
-          echo "LOL=KEK" >> $GITHUB_ENV
 
   test:
     needs: json
     runs-on: 'ubuntu-latest'
     steps:
+      - name: Pre-Test
+        run: |
+          echo "LOL=KEK" >> $GITHUB_ENV
       - name: Test
         run: |
           echo "${{ needs.json.outputs.myjson }}"
