@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo "${{ vars }}"
+          echo "${{ toJson(vars) }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
