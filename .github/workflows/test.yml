@@ -33,9 +33,8 @@ jobs:
         env:
           TEST_VAR: Im test var
         run: |
-          echo "$TEST_ENV"
-          echo "${{ env.TEST_ENV }}"
-          echo "$(eval ($TEST_ENV))"
+          echo "Plain  = $TEST_ENV"
+          echo "Github = ${{ env.TEST_ENV }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
