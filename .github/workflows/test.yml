@@ -33,7 +33,10 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo "${{ toJson(vars) }}" | jq -crM 'to_entries | map("\(.key)=\(.value|tostring)") | .[]'
+          echo '${{ toJson(vars) }}' | jq -crM 'to_entries | map("\(.key)=\"\(.value|tostring)\"") | .[]' >> $GITHUB_ENV
+      - name: Read Env var
+        run: |
+          echo "$MY_ENV_VAR_1"
 
   test-condition:
     runs-on: 'ubuntu-latest'
