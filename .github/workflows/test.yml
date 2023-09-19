@@ -37,6 +37,7 @@ jobs:
       - name: Test
         run: |
           echo '${{ toJson(vars) }}' | jq -crM 'to_entries | map("\(.key)=\"\(.value|tostring)\"") | .[]' >> $GITHUB_ENV
+          echo "right after = $MY_ENV_VAR_1"
       - name: After
         run: |
           echo "$MY_ENV_VAR_1"
