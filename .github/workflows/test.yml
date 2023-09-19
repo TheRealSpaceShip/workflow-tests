@@ -22,7 +22,20 @@ on:
           - choise3
         default: 'choise2'
 
+env:
+  TEST_ENV: "This is test env with var $TEST_VAR"
+
 jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Test env var
+        env:
+          TEST_VAR: Im test var
+        run: |
+          echo "$TEST_ENV"
+          echo "${{ env.TEST_ENV }}"
+          echo "$(eval ($TEST_ENV))"
 
   test-condition:
     runs-on: 'ubuntu-latest'
@@ -40,7 +53,7 @@ jobs:
           echo "BOOLEAN_INPUT=$BOOLEAN_INPUT"
           echo "CHOISE_INPUT=$CHOISE_INPUT"
 
-  test:
+  test-negative-condition:
     runs-on: 'ubuntu-latest'
     if: '!inputs.booleanInput'
     steps:
