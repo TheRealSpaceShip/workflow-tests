@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo "${{ toJson(vars) }}"
+          echo "${{ toJson(vars) }}" | jq -crM 'to_entries | map("\(.key)=\(.value|tostring)") | .[]'
 
   test-condition:
     runs-on: 'ubuntu-latest'
