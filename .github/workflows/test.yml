@@ -23,30 +23,11 @@ on:
         default: 'choise2'
 
 jobs:
-  json:
-    runs-on: 'ubuntu-latest'
-    outputs:
-      myjson: ${{ steps.myjson.outputs.json }}
-    steps:
-      - id: myjson
-        name: JSON
-        run: |
-          echo "json=\"{\"test\":\"test value\"}\"" >> $GITHUB_OUTPUT
-
   test:
-    needs: json
     runs-on: 'ubuntu-latest'
     steps:
-      - name: Pre-Test
-        run: |
-          echo "LOL=test" >> $GITHUB_ENV
       - name: Test
-        env:
-          KEK: Its $LOL
-        run: |
-          echo "${{ needs.json.outputs.myjson }}"
-          echo "$KEK"
-          echo "${{ env.KEK }}"
+        run: env | sort
 
   test-condition:
     runs-on: 'ubuntu-latest'
