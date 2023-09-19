@@ -33,14 +33,17 @@ jobs:
     steps:
       - name: Before
         run: |
-          echo "$MY_ENV_VAR_1"
+          echo "Before = $MY_ENV_VAR_1"
+          echo "Before = ${{ env.MY_ENV_VAR_1 }}"
       - name: Test
         run: |
           echo '${{ toJson(vars) }}' | jq -crM 'to_entries | map("\(.key)=\"\(.value|tostring)\"") | .[]' >> $GITHUB_ENV
           echo "right after = $MY_ENV_VAR_1"
+          echo "right after = ${{ env.MY_ENV_VAR_1 }}"
       - name: After
         run: |
-          echo "$MY_ENV_VAR_1"
+          echo "After = $MY_ENV_VAR_1"
+          echo "After = ${{ env.MY_ENV_VAR_1 }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
