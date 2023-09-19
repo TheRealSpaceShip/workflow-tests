@@ -32,6 +32,7 @@ jobs:
         name: JSON
         run: |
           echo "json=\"{\"test\":\"test value\"}\"" >> $GITHUB_OUTPUT
+          echo "LOL=KEK" >> $GITHUB_ENV
 
   test:
     needs: json
@@ -40,6 +41,8 @@ jobs:
       - name: Test
         run: |
           echo "${{ needs.json.outputs.myjson }}"
+          echo "$LOL"
+          echo "${{ env.LOL }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
