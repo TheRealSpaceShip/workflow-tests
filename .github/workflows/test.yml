@@ -22,6 +22,9 @@ on:
           - choise3
         default: 'choise2'
 
+env:
+  KEK: Its $LOL
+
 jobs:
   json:
     runs-on: 'ubuntu-latest'
@@ -39,14 +42,12 @@ jobs:
     steps:
       - name: Pre-Test
         run: |
-          echo 'LOL="$${{ env.KEK }}"' >> $GITHUB_ENV
+          echo "LOL=test" >> $GITHUB_ENV
       - name: Test
-        env:
-          KEK: Its KEK
         run: |
           echo "${{ needs.json.outputs.myjson }}"
-          echo "$LOL"
-          echo "${{ env.LOL }}"
+          echo "$KEK"
+          echo "${{ env.KEK }}"
 
   test-condition:
     runs-on: 'ubuntu-latest'
