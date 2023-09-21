@@ -8,9 +8,15 @@ on:
         description: 'Environment selector'
         required: true
       stringInput:
+        type: string
         description: 'This is string input'
         required: false
         default: 'stringInput'
+      numberInput:
+        type: number
+        description: 'This is number input'
+        required: false
+        default: 666
       booleanInput:
         type: boolean
         description: 'This is boolean input'
@@ -27,8 +33,8 @@ on:
         default: 'choise2'
 
 jobs:
-  test:
-    name: Use variable ${{ vars.MY_ENV_VAR }}
+  export-environment-vars:
+    name: Use environment variable
     runs-on: 'ubuntu-latest'
     environment: ${{ inputs.environment }}
     steps:
@@ -55,25 +61,28 @@ jobs:
         name: 'Test inputs with conditions'
         env:
           STRING_INPUT: ${{ inputs.stringInput }}
+          NUMBER_INPUT: ${{ inputs.numberInput }}
           BOOLEAN_INPUT: ${{ inputs.booleanInput }}
           CHOISE_INPUT: ${{ inputs.choiseInput }}
         run: |
           echo "STRING_INPUT=$STRING_INPUT"
+          echo "NUMBER_INPUT=$NUMBER_INPUT"
           echo "BOOLEAN_INPUT=$BOOLEAN_INPUT"
           echo "CHOISE_INPUT=$CHOISE_INPUT"
 
-  test-negative-condition:
+  test:
     runs-on: 'ubuntu-latest'
-    if: '!inputs.booleanInput'
     steps:
       -
         id: 'test'
         name: 'Test inputs'
         env:
           STRING_INPUT: ${{ inputs.stringInput }}
+          NUMBER_INPUT: ${{ inputs.numberInput }}
           BOOLEAN_INPUT: ${{ inputs.booleanInput }}
           CHOISE_INPUT: ${{ inputs.choiseInput }}
         run: |
           echo "STRING_INPUT=$STRING_INPUT"
+          echo "NUMBER_INPUT=$NUMBER_INPUT"
           echo "BOOLEAN_INPUT=$BOOLEAN_INPUT"
           echo "CHOISE_INPUT=$CHOISE_INPUT"
